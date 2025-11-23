@@ -11,11 +11,12 @@ pair = {
 def get_valid_sequence():
     """Prompt the user until a valid DNA sequence (a, t, g, c) is provided."""
     while True:
-        seq = input("Enter a DNA sequence (letters a, t, g, c): ").lower().replace(" ", "")
+        raw = input("Enter a DNA sequence (letters a, t, g, c): ")
+        seq = raw.strip().replace(" ", "")
         if not seq:
             print("Empty input. Please enter at least one base (a, t, g, c).")
             continue
-        invalid = sorted(set(ch for ch in seq if ch not in pair))
+        invalid = sorted(set(ch for ch in seq if ch.lower() not in pair))
         if invalid:
             print(f"Invalid characters found: {', '.join(invalid)}. Please use only a, t, g, c.")
             continue
@@ -23,7 +24,14 @@ def get_valid_sequence():
 
 def complement_sequence(seq: str) -> str:
     """Return the complementary DNA sequence for the input sequence."""
-    return ''.join(pair[ch] for ch in seq)
+    # Preserve original letter case: map using lowercase lookup, then
+    # convert to uppercase if the original character was uppercase.
+    out = []
+    for ch in seq:
+        base = ch.lower()
+        comp = pair[base]
+        out.append(comp.upper() if ch.isupper() else comp)
+    return ''.join(out)
 
 def main():
     while True:
